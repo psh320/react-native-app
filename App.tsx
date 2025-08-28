@@ -1,45 +1,71 @@
-/**
- * Sample React Native App
- * https://github.com/facebook/react-native
- *
- * @format
- */
+import React from 'react';
+import { Provider, useSelector } from 'react-redux';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { NavigationContainer } from '@react-navigation/native';
+import { SafeAreaProvider } from 'react-native-safe-area-context';
+import { store, RootState } from './src/core/store';
+import MainNavigator from './src/navigation/MainNavigator';
+import { lightTheme, darkTheme } from './src/core/theme';
 
-import { NewAppScreen } from '@react-native/new-app-screen';
-import { StatusBar, StyleSheet, useColorScheme, View } from 'react-native';
-import {
-  SafeAreaProvider,
-  useSafeAreaInsets,
-} from 'react-native-safe-area-context';
+const queryClient = new QueryClient();
 
-function App() {
-  const isDarkMode = useColorScheme() === 'dark';
+const AppContent = () => {
+  const isDarkMode = useSelector((state: RootState) => state.theme.isDarkMode);
+
+  // Create navigation theme based on your app theme
+  const navigationTheme = {
+    dark: isDarkMode,
+    colors: {
+      primary: isDarkMode
+        ? darkTheme.colors.primary
+        : lightTheme.colors.primary,
+      background: isDarkMode
+        ? darkTheme.colors.background
+        : lightTheme.colors.background,
+      card: isDarkMode ? darkTheme.colors.card : lightTheme.colors.card,
+      text: isDarkMode ? darkTheme.colors.text : lightTheme.colors.text,
+      border: isDarkMode ? darkTheme.colors.border : lightTheme.colors.border,
+      notification: isDarkMode
+        ? darkTheme.colors.primary
+        : lightTheme.colors.primary,
+    },
+    fonts: {
+      regular: {
+        fontFamily: 'System',
+        fontWeight: 'normal' as const,
+      },
+      medium: {
+        fontFamily: 'System',
+        fontWeight: '500' as const,
+      },
+      bold: {
+        fontFamily: 'System',
+        fontWeight: 'bold' as const,
+      },
+      heavy: {
+        fontFamily: 'System',
+        fontWeight: '800' as const,
+      },
+    },
+  };
 
   return (
     <SafeAreaProvider>
-      <StatusBar barStyle={isDarkMode ? 'light-content' : 'dark-content'} />
-      <AppContent />
+      <NavigationContainer theme={navigationTheme}>
+        <MainNavigator />
+      </NavigationContainer>
     </SafeAreaProvider>
   );
-}
+};
 
-function AppContent() {
-  const safeAreaInsets = useSafeAreaInsets();
-
+const App = () => {
   return (
-    <View style={styles.container}>
-      <NewAppScreen
-        templateFileName="App.tsx"
-        safeAreaInsets={safeAreaInsets}
-      />
-    </View>
+    <Provider store={store}>
+      <QueryClientProvider client={queryClient}>
+        <AppContent />
+      </QueryClientProvider>
+    </Provider>
   );
-}
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-  },
-});
+};
 
 export default App;
