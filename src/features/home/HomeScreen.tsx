@@ -5,9 +5,11 @@ import {
   FlatList,
   ActivityIndicator,
   StyleSheet,
+  Platform,
 } from 'react-native';
 import { useQuery } from '@tanstack/react-query';
 import axios from 'axios';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useTheme } from '../../hooks/useTheme';
 import { Theme } from '../../core/theme';
 
@@ -62,6 +64,7 @@ const fetchPosts = async () => {
 
 const HomeScreen = () => {
   const { theme } = useTheme();
+  const insets = useSafeAreaInsets();
   const styles = createStyles(theme);
 
   const { data, isLoading, isError } = useQuery({
@@ -114,7 +117,13 @@ const HomeScreen = () => {
           </View>
         )}
         showsVerticalScrollIndicator={false}
-        contentContainerStyle={{ paddingBottom: theme.spacing.large }}
+        contentContainerStyle={{
+          paddingBottom:
+            Platform.OS === 'ios'
+              ? (insets.bottom > 0 ? 90 + insets.bottom : 90) +
+                theme.spacing.large
+              : 60 + theme.spacing.large,
+        }}
       />
     </View>
   );

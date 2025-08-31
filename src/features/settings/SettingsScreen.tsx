@@ -1,5 +1,6 @@
 import React from 'react';
-import { View, Text, Switch, StyleSheet } from 'react-native';
+import { View, Text, Switch, StyleSheet, Platform } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import PrimaryButton from '../../components/PrimaryButton';
 import { useTheme } from '../../hooks/useTheme';
 import { Theme } from '../../core/theme';
@@ -38,10 +39,22 @@ const createStyles = (theme: Theme) =>
 
 const SettingsScreen = () => {
   const { theme, isDarkMode, toggleTheme } = useTheme();
+  const insets = useSafeAreaInsets();
   const styles = createStyles(theme);
 
   return (
-    <View style={styles.container}>
+    <View
+      style={[
+        styles.container,
+        {
+          paddingBottom:
+            Platform.OS === 'ios'
+              ? (insets.bottom > 0 ? 90 + insets.bottom : 90) +
+                theme.spacing.large
+              : 60 + theme.spacing.large,
+        },
+      ]}
+    >
       <Text style={styles.title}>Settings</Text>
       <View style={styles.settingRow}>
         <Text style={styles.settingText}>Dark Mode</Text>
