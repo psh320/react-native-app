@@ -1,69 +1,41 @@
 import React from 'react';
+import { useColorScheme } from 'react-native';
+import { enableScreens } from 'react-native-screens';
 import { Provider, useSelector } from 'react-redux';
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { PaperProvider, MD3DarkTheme, MD3LightTheme } from 'react-native-paper';
 import { NavigationContainer } from '@react-navigation/native';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
-import { store, RootState } from './src/core/store';
-import MainNavigator from './src/navigation/MainNavigator';
-import { lightTheme, darkTheme } from './src/core/theme';
+import { store } from './src/core/store';
+import { selectThemeMode } from './src/core/themeSlice';
+import RootNavigator from './src/navigation/RootNavigator';
 
-const queryClient = new QueryClient();
+// Enable react-native-screens for better performance
+enableScreens();
 
 const AppContent = () => {
-  const isDarkMode = useSelector((state: RootState) => state.theme.isDarkMode);
+  const systemColorScheme = useColorScheme();
+  const themeMode = useSelector(selectThemeMode);
 
-  // Create navigation theme based on your app theme
-  const navigationTheme = {
-    dark: isDarkMode,
-    colors: {
-      primary: isDarkMode
-        ? darkTheme.colors.primary
-        : lightTheme.colors.primary,
-      background: isDarkMode
-        ? darkTheme.colors.background
-        : lightTheme.colors.background,
-      card: isDarkMode ? darkTheme.colors.card : lightTheme.colors.card,
-      text: isDarkMode ? darkTheme.colors.text : lightTheme.colors.text,
-      border: isDarkMode ? darkTheme.colors.border : lightTheme.colors.border,
-      notification: isDarkMode
-        ? darkTheme.colors.primary
-        : lightTheme.colors.primary,
-    },
-    fonts: {
-      regular: {
-        fontFamily: 'System',
-        fontWeight: 'normal' as const,
-      },
-      medium: {
-        fontFamily: 'System',
-        fontWeight: '500' as const,
-      },
-      bold: {
-        fontFamily: 'System',
-        fontWeight: 'bold' as const,
-      },
-      heavy: {
-        fontFamily: 'System',
-        fontWeight: '800' as const,
-      },
-    },
-  };
+  const isDarkMode =
+    themeMode === 'auto' ? systemColorScheme === 'dark' : themeMode === 'dark';
+
+  const theme = isDarkMode ? MD3DarkTheme : MD3LightTheme;
 
   return (
-    <SafeAreaProvider>
-      <NavigationContainer theme={navigationTheme}>
-        <MainNavigator />
-      </NavigationContainer>
-    </SafeAreaProvider>
+    <PaperProvider theme={theme}>
+      <SafeAreaProvider>
+        <NavigationContainer>
+          <RootNavigator />
+        </NavigationContainer>
+      </SafeAreaProvider>
+    </PaperProvider>
   );
 };
 
 const App = () => {
   return (
     <Provider store={store}>
-      <QueryClientProvider client={queryClient}>
-        <AppContent />
-      </QueryClientProvider>
+      <AppContent />
     </Provider>
   );
 };

@@ -1,26 +1,25 @@
+import { useColorScheme } from 'react-native';
 import { useSelector, useDispatch } from 'react-redux';
-import { selectCurrentTheme, selectIsDarkMode } from '../core/themeSelectors';
-import { toggleTheme } from '../core/themeSlice';
-import { Theme } from '../core/theme';
+import { useTheme as usePaperTheme } from 'react-native-paper';
+import { selectThemeMode, setThemeMode, ThemeMode } from '../core/themeSlice';
 
-interface UseThemeReturn {
-  theme: Theme;
-  isDarkMode: boolean;
-  toggleTheme: () => void;
-}
-
-export const useTheme = (): UseThemeReturn => {
-  const theme = useSelector(selectCurrentTheme);
-  const isDarkMode = useSelector(selectIsDarkMode);
+export const useTheme = () => {
+  const systemColorScheme = useColorScheme();
+  const themeMode = useSelector(selectThemeMode);
+  const paperTheme = usePaperTheme();
   const dispatch = useDispatch();
 
-  const handleToggleTheme = () => {
-    dispatch(toggleTheme());
+  const isDarkMode =
+    themeMode === 'auto' ? systemColorScheme === 'dark' : themeMode === 'dark';
+
+  const handleSetThemeMode = (mode: ThemeMode) => {
+    dispatch(setThemeMode(mode));
   };
 
   return {
-    theme,
+    theme: paperTheme,
+    themeMode,
     isDarkMode,
-    toggleTheme: handleToggleTheme,
+    setThemeMode: handleSetThemeMode,
   };
 };
