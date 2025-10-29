@@ -12,12 +12,6 @@ const RootNavigator = () => {
       }}
     >
       <Stack.Screen name="MainTabs" component={TabNavigator} />
-      {/* Add more screens here later:
-        - Auth screens (Login, Signup)
-        - Onboarding
-        - Modal screens
-        - Detail screens that hide tabs
-      */}
     </Stack.Navigator>
   );
 };
